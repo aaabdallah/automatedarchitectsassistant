@@ -1,0 +1,92 @@
+style distributedprocesses
+	socket sktclient1
+		inbuffersize: 2048;
+		outbuffersize: 2048;
+		streaming: true;
+	end;
+	socket sktclient2
+		inbuffersize: 2048;
+		outbuffersize: 2048;
+		streaming: true;
+	end;
+	socket sktclienttodist
+		inbuffersize: 2048;
+		outbuffersize: 2048;
+		streaming: true;
+	end;
+	socket sktdisttoserver
+		inbuffersize: 2048;
+		outbuffersize: 2048;
+		streaming: true;
+	end;
+	socket sktserver
+		inbuffersize: 2048;
+		outbuffersize: 2048;
+		streaming: true;
+	end;
+	circuit cktc1todist
+		socket1: sktclient1;
+		socket2: sktclienttodist;
+		synchronous: true;
+		reliable: true;
+	end;
+	circuit cktc2todist
+		socket1: sktclient2;
+		socket2: sktclienttodist;
+		synchronous: true;
+		reliable: true;
+	end;
+	circuit cktdisttoserver
+		socket1: sktdisttoserver;
+		socket2: sktserver;
+		synchronous: true;
+		reliable: true;
+	end;
+
+	circuit redundant
+		socket2: sktdisttoserver;
+		socket1: sktserver;
+		synchronous: true;
+		reliable: true;
+	end;
+
+	thread tclient1
+		sockets: sktclient1;
+	end;
+	thread tclient2
+		sockets: sktclient2;
+	end;
+	thread tdist
+		sockets: sktclienttodist, sktdisttoserver;
+	end;
+	thread tserver
+		sockets: sktserver;
+	end;
+	thread bogus
+	end;
+	process pclient
+		initialthreads: tclient1;
+		allowedthreads: tclient1, tclient2;
+	end;
+	process pdist
+		initialthreads: tdist;
+		allowedthreads: tdist;
+	end;
+	process pserver
+		initialthreads: tserver;
+		allowedthreads: tserver;
+	end;
+	threadspawn clientspawn
+		spawner: tclient1;
+		spawnee: tclient2;
+	end;
+	system clientserver
+		interfacesockets: sktserver;
+		initialprocesses: pclient, pdist, pserver;
+		allowedprocesses: pclient, pdist, pserver;
+		initialcircuits: cktc1todist, cktdisttoserver;
+		allowedcircuits: cktc1todist, cktc2todist, cktdisttoserver, redundant;
+		threadspawns: clientspawn;
+	end;
+end;
+

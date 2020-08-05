@@ -1,0 +1,191 @@
+style pipefilter
+	socket tskt1
+		buffersize: 4096;
+	end;
+
+	socket tskt2
+		buffersize: 4096;
+	end;
+
+	socket tskt3
+		buffersize: 4096;
+		rate: 10;
+	end;
+
+	socket tskt4
+		buffersize: 4096;
+	end;
+
+	socket tskt5
+		buffersize: 4096;
+	end;
+
+	filter downloadtelemetry
+		outputsockets: tskt1, tskt2;
+	end;
+
+	filter archivetelemetry
+		inputsockets: tskt3;
+	end;
+
+	filter checktelemetry
+		inputsockets: tskt4;
+		outputsockets: tskt5;
+		averagecpu: 10;
+	end;
+
+	pipe tpipe1
+		sender: tskt1;
+		receiver: tskt4;
+	end;
+
+	pipe tpipe2
+		sender: tskt2;
+		receiver: tskt3;
+	end;
+
+	system telemetrysubsystem
+		filters: downloadtelemetry, archivetelemetry, checktelemetry;
+		pipes: tpipe1, tpipe2;
+		outputsockets: tskt5;
+		cputype: 80x86;
+		discommmech: remoteprocedurecall;
+	end;
+
+	socket cskt1
+		buffersize: 2048;
+	end;
+
+	socket cskt2
+		buffersize: 2048;
+	end;
+
+	socket cskt3
+		buffersize: 2048;
+	end;
+
+	socket cskt4
+		buffersize: 2048;
+	end;
+
+	socket cskt5
+		buffersize: 2048;
+	end;
+
+	socket cskt6
+		buffersize: 2048;
+	end;
+
+	socket cskt7
+		buffersize: 2048;
+	end;
+
+	socket cskt8
+		buffersize: 2048;
+	end;
+
+	socket cskt9
+		buffersize: 2048;
+	end;
+
+	filter checkcommandformat
+		inputsockets: cskt1;
+		outputsockets: cskt2;
+	end;
+
+	filter generatecommandschedule
+		inputsockets: cskt3;
+		outputsockets: cskt4;
+	end;
+
+	filter sendcurrentcommand
+		inputsockets: cskt5;
+		outputsockets: cskt6, cskt7;
+	end;
+
+	filter archivecurrentcommand
+		inputsockets: cskt8;
+	end;
+
+	filter uploadcommand
+		inputsockets: cskt9;
+	end;
+
+	pipe cpipe1
+		sender: cskt2;
+		receiver: cskt3;
+	end;
+
+	pipe cpipe2
+		sender: cskt4;
+		receiver: cskt5;
+	end;
+
+	pipe cpipe3
+		sender: cskt6;
+		receiver: cskt9;
+	end;
+
+	pipe cpipe4
+		sender: cskt7;
+		receiver: cskt8;
+	end;
+
+	system commandsubsystem
+		filters: checkcommandformat, generatecommandschedule,
+			sendcurrentcommand, archivecurrentcommand, uploadcommand;
+		pipes: cpipe1, cpipe2, cpipe3, cpipe4;
+		inputsockets: cskt1;
+		cputype: powerpc;
+		discommmech: messagepassing;
+		implemlang: c;
+	end;
+
+	socket pskt1
+		buffersize: 1024;
+	end;
+
+	socket pskt2
+		buffersize: 1024;
+	end;
+
+	filter processtelemetry
+		inputsockets: pskt1;
+		outputsockets: pskt2;
+	end;
+
+	system processsubsystem
+		filters: processtelemetry;
+		inputsockets: pskt1;
+		outputsockets: pskt2;
+		cputype: 80x86;
+		discommmech: remoteprocedurecall;
+		implemlang: c;
+	end;
+
+	pipe telemtoprocpipe
+		sender: tskt5;
+		receiver: pskt1;
+	end;
+
+	pipe proctocommpipe
+		sender: pskt2;
+		receiver: cskt1;
+	end;
+
+	construction telemetryandprocess
+		subsystem1: telemetrysubsystem;
+		subsystem2: processsubsystem;
+		interpipes: telemtoprocpipe;
+		cputype: 80x86;
+		discommmech: remoteprocedurecall;
+	end;
+
+	construction entiresystem
+		subsystem1: telemetryandprocess;
+		subsystem2: commandsubsystem;
+		interpipes: proctocommpipe;
+		cputype: 80x86;
+		discommmech: remoteprocedurecall;
+	end;
+end;

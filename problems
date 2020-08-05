@@ -1,0 +1,58 @@
++ database of attribute values checks
++ parenthood/ownership check
++ rule to retract all of database
++ unite four attr/db functions into one call
++ topology check for pipe/filter
++ when checking the validity of an entity, some attributes may simply
+		be unspecified.
++ keyword for specifying empty attribute
++ predicate to check if a set of entities has been declared
++ update list of keywords
++ topology checks for other styles
++ check for duplicate entities (abort)
+- allow for resource budgets, cost of transaction/computation, rate of
+		transaction/computation
+- resource budget dependent on user load
+- compute avg/min/max fan-in, fan-out
++ unless attribute predicates are declared dynamic, you will have to
+		run purge every time you start the system to let Prolog know
+		what is dynamic implicitly
+- currently, you can't reuse a component somewhere else in an architecture
+		since the 'parent' attribute is too limiting
++ construction needs to be extended to accomodate N subsystems
+		binary applied more than once =/= construction x N.  e.g.
+		in m/s, if construct three systems with same main in the
+		two constructions [(1+1)+1], is the main instantiated twice,
+		or are the three subsystems invoked from one main?
+*************************************************************
+- some attributes are missing from the styles: need to doublecheck
+		against quals report as well as constraints.txt
+- some of the fixed attributes do not have types associated with them
+		(the ones that are fixedchoice types)
+- construction operator is limited to produce entities that meet the
+constraints of *systems* in that style: example of limiting an operation
+simply to ease analysis.  e.g. construction of two main/subroutine
+systems *must* utilize a new main procedure that calls everything else
+
+*************************************************************
+
+Version 2
+- localobjects have to be uniquely named cos they are defined
+	outside the scope of the enclosing procedure.  This is bad.
+	AL needs to be updated to allow nested definitions.
+*************************************************************
+program remaining group mismatches/constraints
+specify more group mismatches/constraints
+program resource/platform checks
+program user interface
+
+main window:
+choose what entity to specify
+load file
+save current entities to file
+delete all entities
+
+window per entity:
+specify attributes
+
+system spec window:

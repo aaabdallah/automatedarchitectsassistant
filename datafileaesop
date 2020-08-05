@@ -1,0 +1,82 @@
+style obst
+	datacomponent aesop_database
+	end;
+end;
+
+style mach
+	event machmsgtype_rpc
+	end;
+
+	event machmsgtype_encrypted
+	end;
+
+	event machmsgtype_normal
+	end;
+
+	controlcomponent aesop_database_interface1
+	end;
+
+	controlcomponent aesop_database_interface2
+	end;
+
+	system aesop_mach_subsystem
+		initialcontrolcomponents : aesop_database_interface1, aesop_database_interface2;
+		controlcomponents : aesop_database_interface1, aesop_database_interface2;
+	end;
+end;
+
+style softbench
+	event xevent_keypress
+	end;
+
+	event xevent_keyrelease
+	end;
+
+	event xevent_buttonpress
+	end;
+
+	controlcomponent aesop_process1
+	end;
+
+	controlcomponent aesop_process2
+	end;
+
+	controlcomponent aesop_process3
+	end;
+
+	trigger start_aesop_process3
+		controlcomponent : aesop_process2;
+		inmessage : xevent_buttonpress;
+		outcalls : aesop_process3;
+	end;
+		
+	system aesop_softbench_subsystem
+		initialcontrolcomponents : aesop_process1, aesop_process2;
+		controlcomponents : aesop_process1, aesop_process2, aesop_process3;
+		triggers : start_aesop_process3;
+	end;
+end;
+
+style interviews
+	controlcomponent aesop_window1
+	end;
+
+	controlcomponent aesop_window2
+	end;
+
+	system aesop_interviews_subsystem
+		initialcontrolcomponents : aesop_window1, aesop_window2;
+		controlcomponents : aesop_window1, aesop_window2;
+	end;
+end;
+
+style base
+	group aesop
+		subsystems : aesop_mach_subsystem, aesop_softbench_subsystem, 
+			aesop_interviews_subsystem;
+		extendedshareddata : [aesop_database, [aesop_database_interface1,
+			aesop_database_interface2], []];
+	end;
+end;
+
+

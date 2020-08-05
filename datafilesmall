@@ -1,0 +1,6 @@
+style base
+	port p1
+		iotype: ioin;
+		buffersize: 4096;
+	end;
+end;

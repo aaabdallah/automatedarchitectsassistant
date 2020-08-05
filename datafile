@@ -1,0 +1,463 @@
+style base
+	port p1
+		iotype: ioin;
+		buffersize: 4096;
+	end;
+
+	port p2
+		buffersize: 4096;
+	end;
+
+	controlcomponent m1
+		method: false;
+		ports: p1;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent m2
+		method: true;
+		ports : [];
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent m3o1m1
+		method: true;
+	end;
+
+	object m3o1
+		class: class2;
+		methods: m3o1m1;
+	end;
+
+	controlcomponent m3
+		method: true;
+		localobjects: m3o1;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent cc1
+		method: false;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent cc2
+		method: false;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent cc3
+		method: false;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent cc4
+		method: false;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	object o1
+		class: class1;
+		methods: m1, m2;
+		nodes: node1, node2, node3;
+		platform: plat1;
+	end;
+
+	object o2
+		class: class2;
+		methods: m1, m2, m3;
+		nodes: node1, node2, node3;
+		platform: plat1;
+	end;
+
+	controlcomponent o3m1
+		method : true;
+	end;
+
+	controlcomponent o4m1
+		method : true;
+	end;
+
+	object o3
+		class: class1;
+		methods: o3m1;
+		nodes: node1, node2, node3;
+		platform: plat1;
+	end;
+
+	object o4
+		class: class2;
+		methods: o4m1;
+		nodes: node1, node2, node3;
+		platform: plat1;
+	end;
+
+	dataconnector dc1
+		ccobj: ctype;
+		c1: cc2;
+		c2: cc4;
+	end;
+
+	controlcomponent cc5
+		method: false;
+		localobjects : o3;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlcomponent cc6
+		method: false;
+		localobjects: o4;
+		nodes: node1, node2, node4;
+		platform: plat1;
+	end;
+
+	controlconnector call12
+		c1 : cc1;
+		c2 : cc2;
+	end;
+
+	controlconnector call23
+		c1 : cc2;
+		c2 : cc3;
+	end;
+
+	controlconnector call34
+		c1 : cc3;
+		c2 : cc4;
+	end;	
+
+	controlconnector call45
+		c1 : cc4;
+		c2 : cc5;
+	end;
+
+	controlconnector call56
+		c1 : cc5;
+		c2 : cc6;
+	end;
+
+	controlconnector call_cc5_o3m1
+		c1 : cc5;
+		c2 : o3m1;
+		o2 : o3;
+	end;
+
+	controlconnector call_cc5_o4m1
+		c1 : cc5;
+		c2 : o4m1;
+		o2 : o4;
+	end;
+
+	controlconnector call_o3m1_o4m1
+		c1 : o3m1;
+		o1 : o3;
+		c2 : o4m1;
+		o2 : o4;
+	end;
+
+	system sys1
+		initialcontrolcomponents: cc1, cc3;
+		globalobjects: o1, o2;
+		shareddata: [d1, [cc1, cc2], [o1]], [d2, [cc3, cc4], []];
+		controlcomponents: cc1, cc2, cc3, cc4, cc5, cc6;
+		calls : call12, call34, call45, call56, call_cc5_o3m1,
+			call_o3m1_o4m1, call_cc5_o4m1;
+		call_layers: [[cc3], [cc4]], [[cc5],[cc6,o3m1]];
+		classes: class1, class2, class3;
+		dataconnectors: dc1;
+	end;
+end;
+
+style softwarebus
+	controlcomponent bus
+		platform : plat1;
+	end;
+
+	controlcomponent plugin1
+		platform : plat1;
+	end;
+
+	controlcomponent plugin2
+		platform : plat1;
+	end;
+
+	controlcomponent plugin3
+		platform : plat1;
+	end;
+
+	controlconnector call_bus_a
+		c1 : bus;
+		blocking : true;
+	end;
+
+	dataconnector p_bus1
+		ccobj : ctype;
+		c1 : bus;
+		c2 : plugin1;
+	end;
+
+	dataconnector p_bus2
+		ccobj : ctype;
+		c1 : bus;
+	end;
+
+	dataconnector p_bus3
+		ccobj : ctype;
+		c1 : bus;
+		c2 : plugin3;
+	end;
+
+	system sys2
+		initialcontrolcomponents : bus;
+		dataconnectors : p_bus1, p_bus2, p_bus3;
+		controlcomponents : bus, plugin1, plugin2, plugin3;
+		calls : call_bus_a;
+	end;
+end;
+
+style distributed
+	controlcomponent sys3cc1
+		nodes : node1;
+	end;
+
+	system sys3
+		controlcomponents : sys3cc1;
+	end;
+end;
+
+style multithreaded
+	controlcomponent sys4cc1
+		nodes : node1;
+	end;
+
+	controlcomponent sys4cc2
+		nodes : node1;
+	end;
+
+	controlconnector sys4cc1_sys4cc2
+		c1 : sys4cc1;
+		c2 : sys4cc2;
+		blocking : false;
+	end;
+
+	system sys4
+		initialcontrolcomponents : sys4cc1;
+		spawns : sys4cc1_sys4cc2;
+		controlcomponents : sys4cc1, sys4cc2;
+	end;
+end;
+
+style pipefilter
+	socket f1s1
+		iotype : ioout;
+	end;
+
+	socket f2s1
+		iotype : ioout;
+	end;
+
+	socket f3s1
+		iotype : ioout;
+	end;
+
+	socket f1s2
+		iotype : ioin;
+	end;
+
+	socket f2s2
+		iotype : ioin;
+	end;
+
+	socket f3s2
+		iotype : ioin;
+	end;
+
+	filter f1
+		ports : f1s1, f1s2;
+	end;
+
+	filter f2
+		ports : f2s1, f2s2;
+	end;
+
+	filter f3
+		ports : f3s1, f3s2;
+	end;
+
+	pipe f1_f2
+		p1 : f1s1;
+		p2 : f2s2;
+		c1 : f1;
+		c2 : f2;
+	end;
+
+	pipe f2_f3
+		p1 : f2s1;
+		p2 : f3s2;
+		c1 : f2;
+		c2 : f3;
+	end;
+
+	pipe f3_f1
+		p1 : f3s1;
+		p2 : f1s2;
+		c1 : f3;
+		c2 : f1;
+	end;
+
+	system sys5
+		initialcontrolcomponents : f1, f2, f3;
+		controlcomponents : f1, f2, f3;
+		initialdataconnectors : f1_f2, f2_f3, f3_f1;
+		dataconnectors : f1_f2, f2_f3, f3_f1;
+	end;
+end;
+
+style mainsubroutine
+	datastructure sys6_d1
+	end;
+
+	datastructure sys6_d2
+	end;
+
+	datastructure sys6_d3
+	end;
+
+	procedure sys6_c1
+	end;
+
+	procedure sys6_c2
+	end;
+
+	procedure sys6_c3
+	end;
+
+	procedurecall sys6_c1c2
+		c1 : sys6_c1;
+		c2 : sys6_c2;
+	end;
+
+	procedurecall sys6_c2c3
+		c1 : sys6_c2;
+		c2 : sys6_c3;
+		nodes : node1;
+	end;
+
+	system sys6
+		initialcontrolcomponents : sys6_c1;
+		controlcomponents : sys6_c1, sys6_c2, sys6_c3;
+		shareddata : [sys6_d1, [sys6_c1, sys6_c2], []],
+			[sys6_d2, [sys6_c2, sys6_c3], []];
+		calls : sys6_c1c2, sys6_c2c3;
+	end;
+end;
+
+style distributedprocesses
+	socket sys7_p3_p1
+	end;
+
+	socket sys7_p3_p2
+	end;
+
+	socket sys7_p3_p3
+	end;
+
+	socket sys7_p4_p1
+	end;
+
+	socket sys7_p4_p2
+	end;
+
+	socket sys7_p4_p3
+	end;
+
+	process sys7_p1
+	end;
+
+	process sys7_p2
+	end;
+
+	process sys7_p3
+		ports: sys7_p3_p1, sys7_p3_p2, sys7_p3_p3;
+	end;
+
+	process sys7_p4
+		ports: sys7_p4_p1, sys7_p4_p2, sys7_p4_p3;
+	end;
+
+	circuit sys7_p3_p4
+		p1 : sys7_p3_p1;
+		p2 : sys7_p4_p1;
+	end;
+
+	system sys7
+		controlcomponents : sys7_p1, sys7_p2, sys7_p3, sys7_p4;
+		dataconnectors : sys7_p3_p4;
+	end;
+end;
+
+style eventbased
+	event e1
+	end;
+
+	event e2
+	end;
+
+	event e3
+	end;
+
+	trigger sys8_tr1
+		inmessage : e3;
+	end;
+
+	system sys8
+		recognizedmessages : e1, e2;
+		triggers : sys8_tr1;
+	end;
+end;
+
+style unas
+	task t1
+	end;
+
+	task t2
+	end;
+
+	system sys9
+		initialcontrolcomponents : t1;
+		controlcomponents : t1, t2;
+	end;
+end;
+
+style base
+	controlconnector bridge_sys1cc1_sys6c2
+		c1 : cc1;
+		c2 : sys6_c2;
+		blocking : true;
+	end;
+
+	dataconnector dc_bridge_1
+		c1 : cc1;
+		c2 : cc4;
+	end;
+
+	dataconnector dc_bridge_2
+		c1 : cc6;
+		c2 : sys4cc1;
+	end;
+
+	group bigone
+		subsystems : sys6, sys4, sys1;
+		newcalls : bridge_sys1cc1_sys6c2;
+		newdataconnectors : dc_bridge_1, dc_bridge_2;
+		extendedshareddata : [sys6_d1, [sys6_c1, sys6_c2, sys6_c3], []];
+	end;
+end;
+

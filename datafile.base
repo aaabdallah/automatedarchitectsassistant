@@ -1,0 +1,5 @@
+style base
+	port p1
+		buffersize: 4096;
+	end;
+end;

@@ -1,0 +1,112 @@
+style eventbased
+	procedure producetelemetryframes
+	end;
+	procedure produceframestatus
+	end;
+	procedure distributestatus
+	end;
+	object telemetrymanager
+		inputevents: etrawtelemetry, etmanytelemetryframes,
+			etprocessedtelemetry;
+		outputevents: etmanytelemetryframes, etprocessedtelemetry,
+			etfirestatus, ethealthstatus, ettelemetryframe;
+		procedures: producetelemetryframes, produceframestatus,
+			distributestatus;
+		callbacks: [etrawtelemetry,producetelemetryframes],
+			[etmanytelemetryframes,produceframestatus],
+			[etprocessedtelemetry,distributestatus];
+	end;
+
+	procedure getrequests
+	end;
+	procedure submitrequests
+	end;
+	procedure displayfirestatus
+	end;
+	procedure displayhealthstatus
+	end;
+	procedure displaytelemetryframe
+	end;
+	procedure displayanalysisresults
+	end;
+	procedure displayarchivedtelemetry
+	end;
+	procedure displayarchivedcommands
+	end;
+	object interfacemanager
+		inputevents: etoperationrequest, etfirestatus, ethealthstatus,
+			ettelemetryframe, etanalysisresults, etarchivedtelemetry,
+			etarchivedcommands;
+		outputevents: etoperationrequest, ettelemetryarchiverequest,
+			etanalysisrequest, etcommandsarchiverequest;
+		procedures: getrequests, submitrequests, displayfirestatus,
+			displayhealthstatus, displaytelemetryframe,
+			displayanalysisresults, displayarchivedtelemetry,
+			displayarchivedcommands;
+		callbacks: [etoperationrequest, submitrequests],
+			[etfirestatus, displayfirestatus],
+			[ethealthstatus, displayhealthstatus],
+			[ettelemetryframe, displaytelemetryframe],
+			[etanalysisresults, displayanalysisresults],
+			[etarchivedtelemetry, displayarchivedtelemetry],
+			[etarchivedcommands, displayarchivedcommands];
+	end;
+
+	procedure oprequesttocommands
+	end;
+	procedure checkoprequests
+	end;
+	object requestmanager
+		inputevents: etvalidoperationrequest, etsubmittedoperationrequest;
+		outputevents: etvalidoperationrequest, etcommands;
+		procedures: oprequesttocommands, checkoprequests;
+		callbacks: [etsubmittedoperationrequest, checkoprequests],
+			[etvalidoperationrequest, oprequesttocommands];
+	end;
+
+	procedure doanalysis
+	end;
+	procedure getarchivedtelemetry
+	end;
+	procedure getarchivedcommands
+	end;
+	object archivemanager
+		inputevents: etanalysisrequest, ettelemetryarchiverequest,
+			etcommandsarchiverequest;
+		outputevents: etanalysisresults, etarchivedtelemetry,
+			etarchivedcommands;
+		procedures: doanalysis, getarchivedtelemetry, getarchivedcommands;
+		callbacks: [etanalysisrequest, doanalysis],
+			[ettelemetryarchiverequest, getarchivedtelemetry],
+			[etcommandsarchiverequest, getarchivedcommands];
+	end;
+
+	system processingsubsystem
+		initialobjects: telemetrymanager, archivemanager, requestmanager;
+		allowedobjects: telemetrymanager, archivemanager, requestmanager,
+			interfacemanager;
+		recognizedevents: etrawtelemetry, etmanytelemetryframes,
+			ettelemetryframe, etprocessedtelemetry, etfirestatus,
+			ethealthstatus, etanalysisrequest, etanalysisresults,
+			ettelemetryarchiverequest, etarchivedtelemetry,
+			etcommandsarchiverequest, etarchivedcommands, 
+			etvalidoperationrequest, etcommands, etoperationrequest,
+			etsubmittedoperationrequest;
+		registry: [etrawtelemetry, telemetrymanager],
+			[etmanytelemetryframes, telemetrymanager],
+			[etprocessedtelemetry, telemetrymanager],
+			[etvalidoperationrequest, requestmanager],
+			[etsubmittedoperationrequest, requestmanager],
+			[etanalysisrequest, archivemanager],
+			[ettelemetryarchiverequest, archivemanager],
+			[etcommandsarchiverequest, archivemanager],
+			[etoperationrequest, interfacemanager],
+			[etfirestatus, interfacemanager],
+			[ethealthstatus, interfacemanager],
+			[ettelemetryframe, interfacemanager],
+			[etanalysisresults, interfacemanager],
+			[etarchivedtelemetry, interfacemanager],
+			[etarchivedcommands, interfacemanager];
+	end;
+end;
+
